@@ -1,0 +1,22 @@
+[package]
+name = "minercraft-server-monitor-discord-bot"
+description = "A simple Minecraft server status bot for discord"
+version = "0.1.0"
+edition = "2021"
+authors = ["Kevin Wheelans <kevin.wheelans@proton.me"]
+repository = "https://github.com/kwheelans/minercraft-server-monitor"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = {version = "4.1.8", features = ["derive", "cargo"]}
+webhook = "2.1.2"
+tokio = { version = "1", features = ["rt"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+[profile.dev]
+lto = "thin" # this solves feature flag not availbe in stable for rustix in dependancy tree for clap
