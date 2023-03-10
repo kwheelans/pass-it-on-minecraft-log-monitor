@@ -1,2 +1,3 @@
-# minercraft-server-monitor
-Monitor a minecraft server logs
+# Minecraft Server Monitor Discord Bot
+A simple Minecraft server status bot for discord
+

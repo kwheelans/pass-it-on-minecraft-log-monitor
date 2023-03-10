@@ -1,4 +1,4 @@
-use minercraft_server_monitor_discord_bot::{LogClass, LogLevel, LogRecord};
+use minecraft_server_monitor_discord_bot::{LogClass, LogLevel, LogRecord};
 
 const SERVER_START: &str = "[15:44:37] [Server thread/INFO]: Done (4.736s)! For help, type \"help\"";
 const SERVER_VERSION: &str = "[15:44:32] [Server thread/INFO]: Starting minecraft server version 1.19.3";

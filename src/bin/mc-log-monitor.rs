@@ -1,4 +1,4 @@
-use minercraft_server_monitor_discord_bot::{cli, monitor_log};
+use minecraft_server_monitor_discord_bot::{cli, monitor_log};
 
 
 fn main() {
