@@ -1,8 +1,9 @@
 use std::collections::HashSet;
-use std::fs::File;
+use std::fs::{File};
 use std::io;
 use std::io::{BufReader, Read, Seek};
-use std::path::Path;
+use std::os::unix::fs::{DirEntryExt, MetadataExt};
+use std::path::{Path};
 use std::thread::sleep;
 use std::time::{Duration, SystemTime};
 use std::string::String;
@@ -28,6 +29,10 @@ impl LogFile {
 
     pub fn length(&self) -> io::Result<u64> {
         Ok(self.file.metadata()?.len())
+    }
+
+    pub fn inode(&self) -> io::Result<u64> {
+        Ok(self.file.metadata()?.ino())
     }
 
     #[allow(dead_code)]
@@ -61,7 +66,7 @@ impl LogFile {
 }
 
 pub fn monitor_log<P: AsRef<Path>>(path: P, frequency: Duration, url: &str, botname: &str, level_filter:HashSet<LogLevel>, class_filter: HashSet<LogClass>) {
-    let mut logfile = LogFile::from(path).unwrap();
+    let mut logfile = LogFile::from(path.as_ref()).unwrap();
     let mut previous_mod_time = SystemTime::UNIX_EPOCH;
     let mut previous_len = 0;
 
@@ -115,6 +120,12 @@ fn send_discord_alert(records: Vec<LogRecord>, url: &str, botname: &str, level_f
     let to_send:Vec<_> = filtered.iter().map(|r| create_message(botname, &r.message)).collect();
 
     send_messages(url, to_send);
+}
+
+// TODO: getting ino to check if the current latest.log is the same are the one already opened
+// TODO: Add function to check for log rotation by identifying the most recent log that was backed up
+fn get_inode<P: AsRef<Path>>(path: P) -> io::Result<u64> {
+   Ok(File::open(path.as_ref())?.metadata()?.ino())
 }
 
 
