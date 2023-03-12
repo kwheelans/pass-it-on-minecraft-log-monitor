@@ -4,7 +4,7 @@ use std::time::Duration;
 use clap::Parser;
 use crate::{LogClass, LogLevel};
 use crate::LogClass::{ServerOverload, ServerStart, ServerStop, ServerVersion};
-use crate::LogLevel::{Error, Warning};
+use crate::LogLevel::{Error};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -25,7 +25,7 @@ pub struct CliArgs {
     #[clap(short, long, value_parser,  default_value_t = String::from("Server-Status"))]
     pub bot_name: String,
 
-    /// Specify log levels to always be included [default: warning, error]
+    /// Specify log levels to always be included [default: error]
     #[clap(short = 'l', long, value_enum)]
     include_level: Vec<LogLevel>,
 
@@ -38,7 +38,7 @@ impl CliArgs {
     pub fn include_level(&self) -> HashSet<LogLevel> {
         let include_level = self.include_level.to_owned();
         match include_level.is_empty() {
-            true => HashSet::from([Warning, Error]),
+            true => HashSet::from([Error]),
             false => include_level.into_iter().collect()
         }
     }
