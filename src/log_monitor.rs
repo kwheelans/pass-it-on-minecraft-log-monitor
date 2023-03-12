@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::fs::{File};
 use std::io;
 use std::io::{BufReader, Read, Seek};
-use std::os::unix::fs::{DirEntryExt, MetadataExt};
+use std::os::unix::fs::{MetadataExt};
 use std::path::{Path};
 use std::thread::sleep;
 use std::time::{Duration, SystemTime};
@@ -24,9 +24,10 @@ impl LogFile {
         }
 
     pub fn modified_time(&self) -> io::Result<SystemTime> {
-        Ok(self.file.metadata()?.modified()?)
+        self.file.metadata()?.modified()
     }
 
+    #[allow(dead_code)]
     pub fn length(&self) -> io::Result<u64> {
         Ok(self.file.metadata()?.len())
     }
@@ -40,6 +41,7 @@ impl LogFile {
         self.reader.stream_position()
     }
 
+    #[allow(dead_code)]
     pub fn reset_position(&mut self) -> io::Result<()> {
         self.reader.rewind()
     }
@@ -50,7 +52,7 @@ impl LogFile {
 
         if bytes_read.is_err() {
             eprint!("{}", bytes_read.unwrap_err());
-            return None
+            None
 
         } else {
             let buf_string = match std::str::from_utf8(&buf) {
@@ -60,7 +62,7 @@ impl LogFile {
                 },
                 Ok(s) => String::from(s),
             };
-            Some(buf_string.lines().map(|s| String::from(s)).collect())
+            Some(buf_string.lines().map(String::from).collect())
         }
     }
 }
@@ -68,38 +70,26 @@ impl LogFile {
 pub fn monitor_log<P: AsRef<Path>>(path: P, frequency: Duration, url: &str, botname: &str, level_filter:HashSet<LogLevel>, class_filter: HashSet<LogClass>) {
     let mut logfile = LogFile::from(path.as_ref()).unwrap();
     let mut previous_mod_time = SystemTime::UNIX_EPOCH;
-    let mut previous_len = 0;
 
     loop {
         let this_mod_time = logfile.modified_time().unwrap();
-        let this_len = logfile.length().unwrap();
         let records = {
-            if this_len < previous_len {
-                match logfile.reset_position() {
-                    Ok(_) => {
-                        previous_mod_time = this_mod_time;
-                        previous_len = this_len;
-                        parse_log_records(logfile.read_log())
-                    }
-                    Err(e) => {
-                        eprint!("{}", e);
-                        None
-                    }
-                }
+            if log_has_rotated(&path, logfile.inode().unwrap_or(0)) {
+                logfile = LogFile::from(path.as_ref()).unwrap();
+                parse_log_records(logfile.read_log())
             } else {
                 match previous_mod_time != this_mod_time {
                     false => None,
                     true => {
                         previous_mod_time = this_mod_time;
-                        previous_len = this_len;
                         parse_log_records(logfile.read_log())
                     }
                 }
             }
         };
 
-        if records.is_some() {
-            send_discord_alert(records.unwrap(), url, botname, &level_filter, &class_filter)
+        if let Some(recs) = records {
+            send_discord_alert(recs, url, botname, &level_filter, &class_filter)
         }
         sleep(frequency);
     }
@@ -126,6 +116,10 @@ fn send_discord_alert(records: Vec<LogRecord>, url: &str, botname: &str, level_f
 // TODO: Add function to check for log rotation by identifying the most recent log that was backed up
 fn get_inode<P: AsRef<Path>>(path: P) -> io::Result<u64> {
    Ok(File::open(path.as_ref())?.metadata()?.ino())
+}
+
+fn log_has_rotated<P: AsRef<Path>>(path: P, original_inode: u64) -> bool {
+    original_inode != get_inode(path).unwrap_or(0)
 }
 
 
