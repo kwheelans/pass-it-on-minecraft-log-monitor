@@ -76,6 +76,7 @@ pub fn monitor_log<P: AsRef<Path>>(path: P, frequency: Duration, url: &str, botn
         let records = {
             if log_has_rotated(&path, logfile.inode().unwrap_or(0)) {
                 logfile = LogFile::from(path.as_ref()).unwrap();
+                previous_mod_time = this_mod_time;
                 parse_log_records(logfile.read_log())
             } else {
                 match previous_mod_time != this_mod_time {
