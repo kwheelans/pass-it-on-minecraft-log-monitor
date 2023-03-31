@@ -29,7 +29,7 @@ pub struct CliArgs {
     #[clap(short = 'l', long, value_enum)]
     include_level: Vec<LogLevel>,
 
-    /// Specify log classes to always be included [default: server-*]
+    /// Specify log classes to always be included [default: ServerVersion, ServerStart, ServerStop]
     #[clap(short = 'c', long, value_enum)]
     include_class: Vec<LogClass>,
 }
@@ -46,7 +46,7 @@ impl CliArgs {
     pub fn include_class(&self) -> HashSet<LogClass> {
         let include_class = self.include_class.to_owned();
         match include_class.is_empty() {
-            true => HashSet::from([ServerStart, ServerVersion, ServerStop, ServerOverload]),
+            true => HashSet::from([ServerStart, ServerVersion, ServerStop]),
             false => include_class.into_iter().collect(),
         }
     }
