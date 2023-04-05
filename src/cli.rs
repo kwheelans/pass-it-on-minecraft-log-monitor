@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 use clap::Parser;
 use crate::{LogClass, LogLevel};
-use crate::LogClass::{ServerOverload, ServerStart, ServerStop, ServerVersion};
+use crate::LogClass::{ServerStart, ServerStop, ServerVersion};
 use crate::LogLevel::{Error};
 
 #[derive(Parser, Debug)]
