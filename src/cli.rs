@@ -17,13 +17,9 @@ pub struct CliArgs {
     #[clap(short, long, value_parser, default_value_t = 5)]
     frequency: u64,
 
-    /// Discord webhook URL
-    #[clap(short, long, value_parser)]
-    pub webhook_url: String,
-
-    /// Discord bot username
-    #[clap(short, long, value_parser,  default_value_t = String::from("Server-Status"))]
-    pub bot_name: String,
+    /// Path to pass-it-on client configuration file
+    #[clap(long, value_parser)]
+    pub client_config: PathBuf,
 
     /// Specify log levels to always be included [default: error]
     #[clap(short = 'l', long, value_enum)]

@@ -1,5 +1,6 @@
 use std::ops::Add;
 use clap::ValueEnum;
+use log::debug;
 
 const SQUARE_BRACKETS: [char; 2] = ['[', ']'];
 const ROUND_BRACKETS: [char; 2] = ['(', ')'];
@@ -104,13 +105,13 @@ fn parse_status_message(time: &str, level: LogLevel, class: LogClass, log_messag
         LogClass::ServerOverload => status_msg.add(parse_server_overloaded_log(log_message).as_str()),
         _ => status_msg.add(log_message),
     };
-    println!("{}", status_msg);
+    debug!("{}", status_msg);
     status_msg
 }
 
 fn parse_server_start_log(log_message: &str) -> String {
     let split_msg:Vec<_> = log_message.splitn(3, ROUND_BRACKETS).collect();
-    println!("{}", split_msg.len());
+    debug!("{}", split_msg.len());
     if split_msg.len() >= 3 {
         String::from("Server started after ").add(split_msg[1])
     } else {
@@ -125,5 +126,3 @@ fn parse_server_overloaded_log(log_message: &str) -> String {
         _ => log_message.to_string(),
     }
 }
-
-

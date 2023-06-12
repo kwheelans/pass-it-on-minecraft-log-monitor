@@ -1,12 +1,12 @@
 pub mod cli;
 pub mod log_monitor;
 pub mod log_record;
-pub mod discord_bot;
 
 
 pub use {
-    cli::*,
-    log_monitor::*,
+    cli::CliArgs,
+    log_monitor::monitor_log,
     log_record::*,
-    discord_bot::*,
 };
+
+pub const LOG_TARGET: &str = "minecraft-log-monitor";

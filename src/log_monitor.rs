@@ -1,13 +1,15 @@
 use std::collections::HashSet;
-use std::fs::{File};
 use std::io;
-use std::io::{BufReader, Read, Seek};
 use std::os::unix::fs::{MetadataExt};
 use std::path::{Path};
-use std::thread::sleep;
 use std::time::{Duration, SystemTime};
 use std::string::String;
-use crate::{create_message, LogClass, LogLevel, LogRecord, send_messages};
+use log::warn;
+use pass_it_on::notifications::{ClientReadyMessage, Message};
+use tokio::fs::File;
+use tokio::io::{AsyncReadExt, AsyncSeekExt, BufReader};
+use tokio::sync::mpsc;
+use crate::{LogClass, LogLevel, LogRecord};
 
 
 struct LogFile {
@@ -16,48 +18,48 @@ struct LogFile {
 }
 
 impl LogFile {
-    pub fn from <P: AsRef<Path>>(path: P) -> io::Result<Self> {
-        let file = File::open(path)?;
-        let file_clone = file.try_clone()?;
+    pub async fn from <P: AsRef<Path>>(path: P) -> anyhow::Result<Self> {
+        let file = File::open(path).await?;
+        let file_clone = file.try_clone().await?;
         let reader = BufReader::new(file_clone);
         Ok(LogFile {file, reader})
         }
 
-    pub fn modified_time(&self) -> io::Result<SystemTime> {
-        self.file.metadata()?.modified()
+    pub async fn modified_time(&self) -> io::Result<SystemTime> {
+        self.file.metadata().await?.modified()
     }
 
     #[allow(dead_code)]
-    pub fn length(&self) -> io::Result<u64> {
-        Ok(self.file.metadata()?.len())
+    pub async fn length(&self) -> io::Result<u64> {
+        Ok(self.file.metadata().await?.len())
     }
 
-    pub fn inode(&self) -> io::Result<u64> {
-        Ok(self.file.metadata()?.ino())
-    }
-
-    #[allow(dead_code)]
-    pub fn position(&mut self) -> io::Result<u64> {
-        self.reader.stream_position()
+    pub async fn inode(&self) -> io::Result<u64> {
+        Ok(self.file.metadata().await?.ino())
     }
 
     #[allow(dead_code)]
-    pub fn reset_position(&mut self) -> io::Result<()> {
-        self.reader.rewind()
+    pub async fn position(&mut self) -> io::Result<u64> {
+        self.reader.stream_position().await
     }
 
-    pub fn read_log(&mut self) -> Option<Vec<String>> {
+    #[allow(dead_code)]
+    pub async fn reset_position(&mut self) -> io::Result<u64> {
+        self.reader.rewind().await
+    }
+
+    pub async fn read_log(&mut self) -> Option<Vec<String>> {
         let mut buf:Vec<u8> = Vec::new();
-        let bytes_read = self.reader.read_to_end(&mut buf);
+        let bytes_read = self.reader.read_to_end(&mut buf).await;
 
         if bytes_read.is_err() {
-            eprint!("{}", bytes_read.unwrap_err());
+            warn!("{}", bytes_read.unwrap_err());
             None
 
         } else {
             let buf_string = match std::str::from_utf8(&buf) {
                 Err(e) => {
-                    eprint!("{}", e);
+                    warn!("{}", e);
                     String::new()
                 },
                 Ok(s) => String::from(s),
@@ -67,32 +69,37 @@ impl LogFile {
     }
 }
 
-pub fn monitor_log<P: AsRef<Path>>(path: P, frequency: Duration, url: &str, botname: &str, level_filter:HashSet<LogLevel>, class_filter: HashSet<LogClass>) {
-    let mut logfile = LogFile::from(path.as_ref()).unwrap();
+pub async fn monitor_log<P: AsRef<Path>>(path: P, frequency: Duration, level_filter:HashSet<LogLevel>, class_filter: HashSet<LogClass>, notification_name: &str, interface: mpsc::Sender<ClientReadyMessage>) {
+    let mut logfile = LogFile::from(path.as_ref()).await.unwrap();
     let mut previous_mod_time = SystemTime::UNIX_EPOCH;
 
     loop {
-        let this_mod_time = logfile.modified_time().unwrap();
+        let this_mod_time = logfile.modified_time().await.unwrap();
         let records = {
-            if log_has_rotated(&path, &logfile) {
-                logfile = LogFile::from(path.as_ref()).unwrap();
+            if log_has_rotated(&path, &logfile).await {
+                logfile = LogFile::from(path.as_ref()).await.unwrap();
                 previous_mod_time = this_mod_time;
-                parse_log_records(logfile.read_log())
+                parse_log_records(logfile.read_log().await)
             } else {
                 match previous_mod_time != this_mod_time {
                     false => None,
                     true => {
                         previous_mod_time = this_mod_time;
-                        parse_log_records(logfile.read_log())
+                        parse_log_records(logfile.read_log().await)
                     }
                 }
             }
         };
 
         if let Some(recs) = records {
-            send_discord_alert(recs, url, botname, &level_filter, &class_filter)
+            let messages = filter_messages(notification_name, recs, &level_filter, &class_filter);
+            for message in messages {
+                if let Err(error) = interface.send(message).await {
+                    warn!("Error sending notification: {}", error)
+                }
+            }
         }
-        sleep(frequency);
+        tokio::time::sleep(frequency).await;
     }
 }
 
@@ -106,20 +113,19 @@ fn parse_log_records(logs: Option<Vec<String>>) -> Option<Vec<LogRecord>> {
     }
 }
 
-fn send_discord_alert(records: Vec<LogRecord>, url: &str, botname: &str, level_filter: &HashSet<LogLevel>, class_filter: &HashSet<LogClass>) {
+fn filter_messages(notification_name: &str, records: Vec<LogRecord>, level_filter: &HashSet<LogLevel>, class_filter: &HashSet<LogClass>) -> Vec<ClientReadyMessage> {
     let filtered:Vec<_> = records.iter().filter(|r| level_filter.contains(&r.level) || class_filter.contains(&r.class)).collect();
-    let to_send:Vec<_> = filtered.iter().map(|r| create_message(botname, &r.status_message)).collect();
-
-    send_messages(url, to_send);
+    let to_send:Vec<_> = filtered.iter().map(|r| Message::new(r.status_message.as_str()).to_client_ready_message(notification_name)).collect();
+    to_send
 }
 
-fn get_inode<P: AsRef<Path>>(path: P) -> io::Result<u64> {
-   Ok(File::open(path.as_ref())?.metadata()?.ino())
+async fn get_inode<P: AsRef<Path>>(path: P) -> io::Result<u64> {
+   Ok(File::open(path.as_ref()).await?.metadata().await?.ino())
 }
 
 //#[cfg(target_family = "unix")]
-fn log_has_rotated<P: AsRef<Path>>(path: P, original_file: &LogFile) -> bool {
-    original_file.inode().unwrap_or(0) != get_inode(path).unwrap_or(0)
+async fn log_has_rotated<P: AsRef<Path>>(path: P, original_file: &LogFile) -> bool {
+    original_file.inode().await.unwrap_or(0) != get_inode(path).await.unwrap_or(0)
 }
 
 // TODO: Add function to check for log rotation by identifying the most recent log that was backed up
@@ -128,6 +134,3 @@ fn log_has_rotated_win<P: AsRef<Path>>(path: P, original_file: &LogFile) -> bool
     let original_file.file.
     let new_file = File::open(path);
 }*/
-
-
-
