@@ -7,19 +7,15 @@ authors = ["Kevin Wheelans <kevin.wheelans@proton.me"]
 repository = "https://github.com/kwheelans/minercraft-server-monitor"
 license = "MIT"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1"
-clap = {version = "4.1", features = ["derive", "cargo"]}
+clap = {version = "4.3", features = ["derive", "cargo"]}
 tokio = { version = "1", features = ["sync", "macros", "rt-multi-thread", "time", "io-util", "fs"]}
-pass-it-on = { version = "0.3.1", features = ["client", "http-client", "endpoints", "parse-cfg"], default-features = false }
+pass-it-on = { version = "0.6", features = ["client", "http-client", "parse-cfg"], default-features = false }
 log = "0.4"
-simple_logger = "4.1"
+simple_logger = "4.2"
 
 [profile.release]
 lto = true
 codegen-units = 1
-
-[profile.dev]
-lto = "thin" # this solves feature flag not availbe in stable for rustix in dependancy tree for clap

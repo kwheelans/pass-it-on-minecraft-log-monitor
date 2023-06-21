@@ -1,10 +1,10 @@
+use crate::LogClass::{ServerStart, ServerStop, ServerVersion};
+use crate::LogLevel::Error;
+use crate::{LogClass, LogLevel};
+use clap::Parser;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::time::Duration;
-use clap::Parser;
-use crate::{LogClass, LogLevel};
-use crate::LogClass::{ServerStart, ServerStop, ServerVersion};
-use crate::LogLevel::{Error};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -13,20 +13,20 @@ pub struct CliArgs {
     #[clap(short, long, value_parser)]
     pub directory: PathBuf,
 
+    /// Path to pass-it-on client configuration file
+    #[clap(short, long, value_parser)]
+    pub client_config: PathBuf,
+
     ///How often to check the log file in seconds
     #[clap(short, long, value_parser, default_value_t = 5)]
     frequency: u64,
 
-    /// Path to pass-it-on client configuration file
-    #[clap(long, value_parser)]
-    pub client_config: PathBuf,
-
     /// Specify log levels to always be included [default: error]
-    #[clap(short = 'l', long, value_enum)]
+    #[clap(long, value_enum)]
     include_level: Vec<LogLevel>,
 
     /// Specify log classes to always be included [default: ServerVersion, ServerStart, ServerStop]
-    #[clap(short = 'c', long, value_enum)]
+    #[clap(long, value_enum)]
     include_class: Vec<LogClass>,
 }
 
@@ -35,7 +35,7 @@ impl CliArgs {
         let include_level = self.include_level.to_owned();
         match include_level.is_empty() {
             true => HashSet::from([Error]),
-            false => include_level.into_iter().collect()
+            false => include_level.into_iter().collect(),
         }
     }
 
@@ -47,7 +47,7 @@ impl CliArgs {
         }
     }
 
-    pub fn frequency (&self) -> Duration {
+    pub fn frequency(&self) -> Duration {
         Duration::from_secs(self.frequency)
     }
 }

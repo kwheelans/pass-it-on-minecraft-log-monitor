@@ -1,12 +1,12 @@
 [Unit]
-Description=Minecraft Server Monitor Discord Bot - %i
+Description=Minecraft Server Log Monitor - %i
 
 [Service]
 User=minecraft
 
 # Environment
 Environment=DIRECTORY=/path/to/server/
-Environment=WEBHOOK_URL=https://YOUR_DISCORD_WEBKOOK_URL
+Environment=CLIENT_CONFIG=/path/to/pass-it-on/client/configuration
 
 WorkingDirectory=$DIRECTORY
 ExecPaths=/usr/bin
@@ -20,7 +20,7 @@ ProtectKernelModules=true
 ProtectControlGroups=true
 NoNewPrivileges=true
 
-ExecStart=/bin/sh -c "/usr/bin/mc-log-monitor -d ${WorkingDirectory} -w ${WEBHOOK_URL}"
+ExecStart=/bin/sh -c "/usr/bin/mc-log-monitor -d ${WorkingDirectory} -c ${CLIENT_CONFIG}"
 
 [Install]
 WantedBy=multi-user.target
