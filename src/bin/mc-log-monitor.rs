@@ -1,9 +1,8 @@
+use clap::Parser;
 use log::{error, LevelFilter};
-use minecraft_server_monitor_discord_bot::{cli, monitor_log, LOG_TARGET};
+use minecraft_server_monitor_discord_bot::{monitor_log, CliArgs, LOG_TARGET};
 use pass_it_on::{start_client, ClientConfiguration, Error};
 use tokio::sync::mpsc;
-
-const NOTIFICATION_NAME: &str = "mc-log";
 
 #[tokio::main]
 async fn main() {
@@ -22,13 +21,13 @@ async fn main() {
 }
 
 async fn run() -> Result<(), Error> {
-    let args = cli::get();
-    let log_path = args.directory.join("logs/latest.log");
+    let args = CliArgs::parse();
+    let log_path = args.directory().join("logs/latest.log");
     let frequency = args.frequency();
     let level_filter = args.include_level();
     let class_filter = args.include_class();
     let client_config =
-        ClientConfiguration::try_from(std::fs::read_to_string(args.client_config)?.as_str())?;
+        ClientConfiguration::try_from(std::fs::read_to_string(args.client_config())?.as_str())?;
     let (interface_tx, interface_rx) = mpsc::channel(100);
 
     tokio::spawn(async move {
@@ -37,7 +36,7 @@ async fn run() -> Result<(), Error> {
             frequency,
             level_filter,
             class_filter,
-            NOTIFICATION_NAME,
+            args.notification_name(),
             interface_tx.clone(),
         )
         .await;

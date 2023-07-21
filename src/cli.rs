@@ -3,23 +3,27 @@ use crate::LogLevel::Error;
 use crate::{LogClass, LogLevel};
 use clap::Parser;
 use std::collections::HashSet;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 #[derive(Parser, Debug)]
-#[clap(author, version, about, long_about = None)]
+#[command(author, version, about, long_about = None)]
 pub struct CliArgs {
     /// Path to minecraft server directory
     #[clap(short, long, value_parser)]
-    pub directory: PathBuf,
+    directory: PathBuf,
 
     /// Path to pass-it-on client configuration file
     #[clap(short, long, value_parser)]
-    pub client_config: PathBuf,
+    client_config: PathBuf,
 
-    ///How often to check the log file in seconds
+    /// How often to check the log file in seconds
     #[clap(short, long, value_parser, default_value_t = 5)]
     frequency: u64,
+
+    /// Notification name for pass-it-on client to use
+    #[clap(short, long, value_parser, default_value = "mc-log")]
+    notification_name: String,
 
     /// Specify log levels to always be included [default: error]
     #[clap(long, value_enum)]
@@ -31,6 +35,22 @@ pub struct CliArgs {
 }
 
 impl CliArgs {
+    pub fn directory(&self) -> &Path {
+        self.directory.as_path()
+    }
+
+    pub fn client_config(&self) -> &Path {
+        self.client_config.as_path()
+    }
+
+    pub fn frequency(&self) -> Duration {
+        Duration::from_secs(self.frequency)
+    }
+
+    pub fn notification_name(&self) -> &str {
+        &self.notification_name
+    }
+
     pub fn include_level(&self) -> HashSet<LogLevel> {
         let include_level = self.include_level.to_owned();
         match include_level.is_empty() {
@@ -46,12 +66,4 @@ impl CliArgs {
             false => include_class.into_iter().collect(),
         }
     }
-
-    pub fn frequency(&self) -> Duration {
-        Duration::from_secs(self.frequency)
-    }
-}
-
-pub fn get() -> CliArgs {
-    CliArgs::parse()
 }
