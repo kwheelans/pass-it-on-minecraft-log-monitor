@@ -1,5 +1,5 @@
 [package]
-name = "minecraft-server-monitor-discord-bot"
+name = "minecraft-server-monitor"
 description = "A simple Minecraft server status monitor using pass-it-on client"
 version = "0.2.0"
 edition = "2021"
