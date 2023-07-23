@@ -1,10 +1,9 @@
-use crate::LogClass::{ServerStart, ServerStop, ServerVersion};
-use crate::LogLevel::Error;
 use crate::{LogClass, LogLevel};
 use clap::Parser;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
+use log::LevelFilter;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -25,13 +24,17 @@ pub struct CliArgs {
     #[clap(short, long, value_parser, default_value = "mc-log")]
     notification_name: String,
 
-    /// Specify log levels to always be included [default: error]
-    #[clap(long, value_enum)]
+    /// Specify log levels to always be included
+    #[clap(long, value_enum, default_value = "error")]
     include_level: Vec<LogLevel>,
 
-    /// Specify log classes to always be included [default: ServerVersion, ServerStart, ServerStop]
-    #[clap(long, value_enum)]
+    /// Specify log classes to always be included
+    #[clap(long, value_enum, default_values_t = [LogClass::ServerVersion, LogClass::ServerStart, LogClass::ServerStop])]
     include_class: Vec<LogClass>,
+
+    /// Set the logging level
+    #[clap(long, value_enum, default_value = "info")]
+    log_level: LevelFilter,
 }
 
 impl CliArgs {
@@ -52,18 +55,14 @@ impl CliArgs {
     }
 
     pub fn include_level(&self) -> HashSet<LogLevel> {
-        let include_level = self.include_level.to_owned();
-        match include_level.is_empty() {
-            true => HashSet::from([Error]),
-            false => include_level.into_iter().collect(),
-        }
+        self.include_level.iter().copied().collect()
     }
 
     pub fn include_class(&self) -> HashSet<LogClass> {
-        let include_class = self.include_class.to_owned();
-        match include_class.is_empty() {
-            true => HashSet::from([ServerStart, ServerVersion, ServerStop]),
-            false => include_class.into_iter().collect(),
-        }
+        self.include_class.iter().copied().collect()
+    }
+
+    pub fn log_level(&self) -> LevelFilter {
+        self.log_level
     }
 }

@@ -6,22 +6,22 @@ use tokio::sync::mpsc;
 
 #[tokio::main]
 async fn main() {
+    let args = CliArgs::parse();
     simple_logger::SimpleLogger::new()
         .with_level(LevelFilter::Off)
         .env()
-        .with_module_level(pass_it_on::LIB_LOG_TARGET, LevelFilter::Info)
-        .with_module_level(LOG_TARGET, LevelFilter::Info)
+        .with_module_level(pass_it_on::LIB_LOG_TARGET, args.log_level())
+        .with_module_level(LOG_TARGET, args.log_level())
         .with_colors(true)
         .init()
         .unwrap();
 
-    if let Err(error) = run().await {
+    if let Err(error) = run(args).await {
         error!(target: LOG_TARGET, "{}", error)
     }
 }
 
-async fn run() -> Result<(), Error> {
-    let args = CliArgs::parse();
+async fn run(args: CliArgs) -> Result<(), Error> {
     let log_path = args.directory().join("logs/latest.log");
     let frequency = args.frequency();
     let level_filter = args.include_level();
@@ -39,7 +39,7 @@ async fn run() -> Result<(), Error> {
             args.notification_name(),
             interface_tx.clone(),
         )
-        .await;
+        .await
     });
 
     start_client(client_config, interface_rx, None).await?;

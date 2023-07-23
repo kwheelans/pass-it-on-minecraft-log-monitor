@@ -1,5 +1,5 @@
-use crate::{LogClass, LogLevel, LogRecord};
-use log::warn;
+use crate::{LOG_TARGET, LogClass, LogLevel, LogRecord};
+use log::{debug, info, warn};
 use pass_it_on::notifications::{ClientReadyMessage, Message};
 use std::collections::HashSet;
 use std::io;
@@ -77,11 +77,13 @@ pub async fn monitor_log<P: AsRef<Path>>(
 ) {
     let mut logfile = LogFile::from(path.as_ref()).await.unwrap();
     let mut previous_mod_time = SystemTime::UNIX_EPOCH;
+    info!(target: LOG_TARGET, "Monitoring log -> {}", path.as_ref().to_string_lossy());
 
     loop {
         let this_mod_time = logfile.modified_time().await.unwrap();
         let records = {
             if log_has_rotated(&path, &logfile).await {
+                debug!(target: LOG_TARGET, "Log rotation detected");
                 logfile = LogFile::from(path.as_ref()).await.unwrap();
                 previous_mod_time = this_mod_time;
                 parse_log_records(logfile.read_log().await)
@@ -100,7 +102,7 @@ pub async fn monitor_log<P: AsRef<Path>>(
             let messages = filter_messages(notification_name, recs, &level_filter, &class_filter);
             for message in messages {
                 if let Err(error) = interface.send(message).await {
-                    warn!("Error sending notification: {}", error)
+                    warn!(target: LOG_TARGET, "Error sending notification: {}", error)
                 }
             }
         }
