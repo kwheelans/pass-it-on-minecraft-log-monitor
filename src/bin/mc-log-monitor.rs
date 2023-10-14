@@ -1,6 +1,6 @@
 use clap::Parser;
 use log::{error, LevelFilter};
-use minecraft_server_monitor::{monitor_log, CliArgs, LOG_TARGET};
+use pio_minecraft_server_monitor::{monitor_log, CliArgs, LOG_TARGET};
 use pass_it_on::{start_client, ClientConfiguration, Error};
 use tokio::sync::mpsc;
 
@@ -42,7 +42,7 @@ async fn run(args: CliArgs) -> Result<(), Error> {
         .await
     });
 
-    start_client(client_config, interface_rx, None).await?;
+    start_client(client_config, interface_rx, None, None).await?;
 
     Ok(())
 }

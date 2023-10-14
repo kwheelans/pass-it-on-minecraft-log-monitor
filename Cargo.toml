@@ -1,10 +1,10 @@
 [package]
-name = "minecraft-server-monitor"
+name = "pio-minecraft-server-monitor"
 description = "A simple Minecraft server status monitor using pass-it-on client"
-version = "0.2.3"
+version = "0.3.0"
 edition = "2021"
 authors = ["Kevin Wheelans <kevin.wheelans@proton.me"]
-repository = "https://github.com/kwheelans/minercraft-server-monitor"
+repository = "https://github.com/kwheelans/pio-minercraft-server-monitor"
 license = "MIT"
 
 
@@ -12,7 +12,7 @@ license = "MIT"
 anyhow = "1"
 clap = {version = "4", features = ["derive", "cargo"]}
 tokio = { version = "1", features = ["sync", "macros", "rt-multi-thread", "time", "io-util", "fs"]}
-pass-it-on = { version = "0.6", features = ["client", "http-client", "parse-cfg"], default-features = false }
+pass-it-on = { version = "0.7", features = ["client", "http-client", "parse-cfg"], default-features = false }
 log = "0.4"
 simple_logger = "4.2"
 
