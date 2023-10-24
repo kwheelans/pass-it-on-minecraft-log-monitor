@@ -1,7 +1,7 @@
 # v0.3.0
 ## Changes
 - change crate name to `pio-minecraft-server-monitor`
-- update `pass-it-on` to 0.7.1 and make necessary changes
+- update `pass-it-on` to 0.8.0 and make necessary changes
 - Fix tests
 
 # v0.2.3
