@@ -1,3 +1,4 @@
+use std::io::ErrorKind;
 use clap::Parser;
 use log::{error, LevelFilter};
 use pass_it_on::{start_client, Error};
@@ -34,12 +35,15 @@ async fn run(args: CliArgs) -> Result<(), Error> {
         monitor_config = parsed_config.monitor;
         client_config = parsed_config.client.try_into()?;
     }
+    if monitor_config.log_path().exists() {
+        let (interface_tx, interface_rx) = mpsc::channel(100);
 
-    let (interface_tx, interface_rx) = mpsc::channel(100);
+        tokio::spawn(async move { monitor_log(monitor_config, interface_tx.clone()).await });
 
-    tokio::spawn(async move { monitor_log(monitor_config, interface_tx.clone()).await });
-
-    start_client(client_config, interface_rx, None, None).await?;
-
-    Ok(())
+        start_client(client_config, interface_rx, None, None).await?;
+        Ok(())
+    } else {
+        error!(target: LOG_TARGET, "Specified logfile does not exist -> {}", monitor_config.log_path().to_string_lossy());
+        Err(Error::IOError(std::io::Error::new(ErrorKind::NotFound, "file does not exist")))
+    }
 }
