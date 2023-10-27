@@ -1,5 +1,6 @@
 use clap::ValueEnum;
 use log::debug;
+use serde::Deserialize;
 use std::ops::Add;
 
 const SQUARE_BRACKETS: [char; 2] = ['[', ']'];
@@ -8,7 +9,7 @@ const COLON: char = ':';
 const BACKSLASH: char = '/';
 const STATUS_DELIM: &str = " - ";
 
-#[derive(Debug, PartialEq, Eq, Hash, ValueEnum, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, ValueEnum, Deserialize, Clone, Copy)]
 pub enum LogLevel {
     Info,
     Warning,
@@ -16,7 +17,7 @@ pub enum LogLevel {
     Other,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, ValueEnum, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, ValueEnum, Deserialize, Clone, Copy)]
 pub enum LogClass {
     UserAuth,
     UserJoinedDetails,

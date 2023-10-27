@@ -42,8 +42,7 @@ fn parse_log_server_overload() {
         "19:33:39".to_string(),
         LogLevel::Warning,
         LogClass::ServerOverload,
-        "19:33:39 - Warning - Server running slow. Running 2033ms or 40 ticks behind"
-            .to_string(),
+        "19:33:39 - Warning - Server running slow. Running 2033ms or 40 ticks behind".to_string(),
     );
     let log = LogRecord::from_record(SERVER_OVERLOAD).unwrap();
     assert_eq!(log, expected);

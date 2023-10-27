@@ -1,4 +1,5 @@
-use crate::{LOG_TARGET, LogClass, LogLevel, LogRecord};
+use crate::configuration::MonitorConfiguration;
+use crate::{LogClass, LogLevel, LogRecord, LOG_TARGET};
 use log::{debug, info, warn};
 use pass_it_on::notifications::{ClientReadyMessage, Message};
 use std::collections::HashSet;
@@ -6,7 +7,7 @@ use std::io;
 use std::os::unix::fs::MetadataExt;
 use std::path::Path;
 use std::string::String;
-use std::time::{Duration, SystemTime};
+use std::time::SystemTime;
 use tokio::fs::File;
 use tokio::io::{AsyncReadExt, AsyncSeekExt, BufReader};
 use tokio::sync::mpsc;
@@ -67,24 +68,21 @@ impl LogFile {
     }
 }
 
-pub async fn monitor_log<P: AsRef<Path>>(
-    path: P,
-    frequency: Duration,
-    level_filter: HashSet<LogLevel>,
-    class_filter: HashSet<LogClass>,
-    notification_name: &str,
+pub async fn monitor_log(
+    monitor_config: MonitorConfiguration,
     interface: mpsc::Sender<ClientReadyMessage>,
 ) {
-    let mut logfile = LogFile::from(path.as_ref()).await.unwrap();
+    let path = monitor_config.log_path();
+    let mut logfile = LogFile::from(path).await.unwrap();
     let mut previous_mod_time = SystemTime::UNIX_EPOCH;
-    info!(target: LOG_TARGET, "Monitoring log -> {}", path.as_ref().to_string_lossy());
+    info!(target: LOG_TARGET, "Monitoring log -> {}", path.to_string_lossy());
 
     loop {
         let this_mod_time = logfile.modified_time().await.unwrap();
         let records = {
-            if log_has_rotated(&path, &logfile).await {
+            if log_has_rotated(path, &logfile).await {
                 debug!(target: LOG_TARGET, "Log rotation detected");
-                logfile = LogFile::from(path.as_ref()).await.unwrap();
+                logfile = LogFile::from(path).await.unwrap();
                 previous_mod_time = this_mod_time;
                 parse_log_records(logfile.read_log().await)
             } else {
@@ -99,14 +97,17 @@ pub async fn monitor_log<P: AsRef<Path>>(
         };
 
         if let Some(recs) = records {
-            let messages = filter_messages(notification_name, recs, &level_filter, &class_filter);
-            for message in messages {
-                if let Err(error) = interface.send(message).await {
-                    warn!(target: LOG_TARGET, "Error sending notification: {}", error)
+            for n in monitor_config.notification() {
+                let messages =
+                    filter_messages(n.name(), &recs, &n.include_level(), &n.include_class());
+                for message in messages {
+                    if let Err(error) = interface.send(message).await {
+                        warn!(target: LOG_TARGET, "Error sending notification: {}", error)
+                    }
                 }
             }
         }
-        tokio::time::sleep(frequency).await;
+        tokio::time::sleep(monitor_config.frequency()).await;
     }
 }
 
@@ -125,7 +126,7 @@ fn parse_log_records(logs: Option<Vec<String>>) -> Option<Vec<LogRecord>> {
 
 fn filter_messages(
     notification_name: &str,
-    records: Vec<LogRecord>,
+    records: &[LogRecord],
     level_filter: &HashSet<LogLevel>,
     class_filter: &HashSet<LogClass>,
 ) -> Vec<ClientReadyMessage> {

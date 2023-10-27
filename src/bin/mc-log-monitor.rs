@@ -1,11 +1,12 @@
 use clap::Parser;
 use log::{error, LevelFilter};
+use pass_it_on::{start_client, Error};
+use pio_minecraft_server_monitor::configuration::MonitorConfigFileParser;
 use pio_minecraft_server_monitor::{monitor_log, CliArgs, LOG_TARGET};
-use pass_it_on::{start_client, ClientConfiguration, Error};
 use tokio::sync::mpsc;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Error> {
     let args = CliArgs::parse();
     simple_logger::SimpleLogger::new()
         .with_level(LevelFilter::Off)
@@ -19,28 +20,24 @@ async fn main() {
     if let Err(error) = run(args).await {
         error!(target: LOG_TARGET, "{}", error)
     }
+    Ok(())
 }
 
 async fn run(args: CliArgs) -> Result<(), Error> {
-    let log_path = args.directory().join("logs/latest.log");
-    let frequency = args.frequency();
-    let level_filter = args.include_level();
-    let class_filter = args.include_class();
-    let client_config =
-        ClientConfiguration::try_from(std::fs::read_to_string(args.client_config())?.as_str())?;
+    let monitor_config;
+    let client_config;
+
+    {
+        let parsed_config = MonitorConfigFileParser::try_from(
+            std::fs::read_to_string(args.monitor_config().unwrap())?.as_str(),
+        )?;
+        monitor_config = parsed_config.monitor;
+        client_config = parsed_config.client.try_into()?;
+    }
+
     let (interface_tx, interface_rx) = mpsc::channel(100);
 
-    tokio::spawn(async move {
-        monitor_log(
-            log_path,
-            frequency,
-            level_filter,
-            class_filter,
-            args.notification_name(),
-            interface_tx.clone(),
-        )
-        .await
-    });
+    tokio::spawn(async move { monitor_log(monitor_config, interface_tx.clone()).await });
 
     start_client(client_config, interface_rx, None, None).await?;
 

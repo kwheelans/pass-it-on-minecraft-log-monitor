@@ -1,4 +1,5 @@
 pub mod cli;
+pub mod configuration;
 pub mod log_monitor;
 pub mod log_record;
 

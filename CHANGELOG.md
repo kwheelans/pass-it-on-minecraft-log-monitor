@@ -1,7 +1,11 @@
 # v0.3.0
+## Features
+- Add ability to configure multiple notification name with different filters
+- monitor and client now configurable in a single TOML file
+
 ## Changes
 - change crate name to `pio-minecraft-server-monitor`
-- update `pass-it-on` to 0.8.0 and make necessary changes
+- update `pass-it-on` to 0.9.0 and make necessary changes
 - Fix tests
 
 # v0.2.3
