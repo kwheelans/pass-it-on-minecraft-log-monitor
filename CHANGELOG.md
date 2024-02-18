@@ -1,3 +1,7 @@
+# v0.4.0
+## Breaking Changes
+- bump pass-it-on to 0.11.0 which is not backwards compatible
+
 # v0.3.0
 ## Features
 - Add ability to configure multiple notification name with different filters

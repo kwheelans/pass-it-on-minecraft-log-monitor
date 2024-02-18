@@ -5,10 +5,10 @@ Description=Minecraft Server Log Monitor - %i
 User=minecraft
 
 # Environment
-Environment=DIRECTORY=/path/to/server/
-Environment=CLIENT_CONFIG=/path/to/pass-it-on/client/configuration
+Environment=DIRECTORY=/path/to/minecraft
+Environment=CONFIG=/path/to/configuration
 
-WorkingDirectory=$DIRECTORY
+WorkingDirectory=$Directory/%i
 ExecPaths=/usr/bin
 
 PrivateUsers=true
@@ -20,7 +20,7 @@ ProtectKernelModules=true
 ProtectControlGroups=true
 NoNewPrivileges=true
 
-ExecStart=/bin/sh -c "/usr/bin/mc-log-monitor -d ${WorkingDirectory} -c ${CLIENT_CONFIG}"
+ExecStart=/bin/sh -c "/usr/bin/mc-log-monitor --monitor-config ${CONFIG}"
 
 [Install]
 WantedBy=multi-user.target
