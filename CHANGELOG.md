@@ -1,3 +1,7 @@
+# v0.5.0
+## Breaking Changes
+- bump pass-it-on to 0.14.2 which contains breaking changes
+
 # v0.4.0
 ## Breaking Changes
 - bump pass-it-on to 0.11.0 which is not backwards compatible
