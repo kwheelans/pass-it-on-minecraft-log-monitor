@@ -1,5 +1,5 @@
 [package]
-name = "pio-minecraft-server-monitor"
+name = "pass-it-on-minecraft-log-monitor"
 description = "A simple Minecraft server status monitor using pass-it-on client"
 version = "0.5.0"
 edition = "2021"
