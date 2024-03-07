@@ -1,9 +1,9 @@
-use std::io::ErrorKind;
 use clap::Parser;
 use log::{error, LevelFilter};
 use pass_it_on::{start_client, Error};
 use pass_it_on_minecraft_log_monitor::configuration::MonitorConfigFileParser;
 use pass_it_on_minecraft_log_monitor::{monitor_log, CliArgs, LOG_TARGET};
+use std::io::ErrorKind;
 use tokio::sync::mpsc;
 
 #[tokio::main]
@@ -44,6 +44,9 @@ async fn run(args: CliArgs) -> Result<(), Error> {
         Ok(())
     } else {
         error!(target: LOG_TARGET, "Specified logfile does not exist -> {}", monitor_config.log_path().to_string_lossy());
-        Err(Error::IOError(std::io::Error::new(ErrorKind::NotFound, "file does not exist")))
+        Err(Error::IOError(std::io::Error::new(
+            ErrorKind::NotFound,
+            "file does not exist",
+        )))
     }
 }

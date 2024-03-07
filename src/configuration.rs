@@ -1,4 +1,4 @@
-use crate::{LogClass, LogLevel};
+use crate::log_record::{LogClass, LogLevel};
 use pass_it_on::ClientConfigFile;
 use serde::Deserialize;
 use std::collections::HashSet;

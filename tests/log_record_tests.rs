@@ -1,4 +1,4 @@
-use pass_it_on_minecraft_log_monitor::{LogClass, LogLevel, LogRecord};
+use pass_it_on_minecraft_log_monitor::log_record::{LogClass, LogLevel, LogRecord};
 
 const SERVER_START: &str =
     "[15:44:37] [Server thread/INFO]: Done (4.736s)! For help, type \"help\"";

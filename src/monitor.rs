@@ -1,5 +1,6 @@
 use crate::configuration::MonitorConfiguration;
-use crate::{LogClass, LogLevel, LogRecord, LOG_TARGET};
+use crate::log_record::{LogClass, LogLevel, LogRecord};
+use crate::LOG_TARGET;
 use log::{debug, info, warn};
 use pass_it_on::notifications::{ClientReadyMessage, Message};
 use std::collections::HashSet;
