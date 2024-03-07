@@ -6,7 +6,7 @@ COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
-WORKDIR /pass-it-on
+WORKDIR /mc-log-monitor
 
 # Build dependencies
 COPY --from=planner /recipe/recipe.json recipe.json
@@ -25,9 +25,9 @@ WORKDIR /mc-log-monitor
 ENV PATH=/mc-log-monitor:$PATH \
 LOG_LEVEL=Info
 
+ADD resources/docker/start_monitor.sh /mc-log-monitor/
 COPY --from=builder /mc-log-monitor/target/release/mc-log-monitor /mc-log-monitor
-ADD resources/docker/start_server.sh /mc-log-monitor/
 VOLUME /config
 VOLUME /logs
 
-CMD ["/bin/sh","start_server.sh"]
+CMD ["/bin/sh","start_monitor.sh"]
