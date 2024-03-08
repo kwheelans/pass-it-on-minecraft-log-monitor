@@ -43,6 +43,7 @@ jobs:
         run: |
           mkdir -p ${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}-${{ github.ref_name }}-${{ matrix.target }}
           mkdir ${{ env.UPLOAD_DIR }}
+          ls -lh
           cp -v ${{ env.RELEASE_ADDS }} ${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}-${{ github.ref_name }}-${{ matrix.target }}
 
 
