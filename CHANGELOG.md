@@ -1,3 +1,7 @@
+# v0.6.1
+## Changes
+- Add startup delay to Dockerfile control by `DELAY_STARTUP` environment variable
+
 # v0.6.0
 ## Changes
 - Add workflows

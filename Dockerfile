@@ -23,7 +23,8 @@ RUN mkdir /mc-log-monitor
 WORKDIR /mc-log-monitor
 
 ENV PATH=/mc-log-monitor:$PATH \
-LOG_LEVEL=Info
+LOG_LEVEL=Info \
+STARTUP_DELAY=20
 
 ADD resources/docker/start_monitor.sh /mc-log-monitor/
 COPY --from=builder /mc-log-monitor/target/release/mc-log-monitor /mc-log-monitor
