@@ -1,3 +1,9 @@
+# v0.6.0
+# Changes
+- Add workflows
+- Add Dockerfile
+- Change crate name
+
 # v0.5.0
 ## Breaking Changes
 - bump pass-it-on to 0.14.2 which contains breaking changes
