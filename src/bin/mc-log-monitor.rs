@@ -1,9 +1,10 @@
 use clap::Parser;
-use log::{error, LevelFilter};
+use log::{error, info, LevelFilter};
 use pass_it_on::{start_client, Error};
 use pass_it_on_minecraft_log_monitor::configuration::MonitorConfigFileParser;
 use pass_it_on_minecraft_log_monitor::{monitor_log, CliArgs, LOG_TARGET};
 use std::io::ErrorKind;
+use std::time::Duration;
 use tokio::sync::mpsc;
 
 #[tokio::main]
@@ -28,6 +29,8 @@ async fn run(args: CliArgs) -> Result<(), Error> {
     let monitor_config;
     let client_config;
 
+    info!(target: LOG_TARGET, "Minecraft log monitor starting");
+
     {
         let parsed_config = MonitorConfigFileParser::try_from(
             std::fs::read_to_string(args.monitor_config().unwrap())?.as_str(),
@@ -37,6 +40,11 @@ async fn run(args: CliArgs) -> Result<(), Error> {
     }
     if monitor_config.log_path().exists() {
         let (interface_tx, interface_rx) = mpsc::channel(100);
+
+        if let Some(delay) = args.delay() {
+            info!(target: LOG_TARGET, "Delaying log monitoring start for {} seconds", delay);
+            tokio::time::sleep(Duration::from_secs(delay)).await;
+        }
 
         tokio::spawn(async move { monitor_log(monitor_config, interface_tx.clone()).await });
 

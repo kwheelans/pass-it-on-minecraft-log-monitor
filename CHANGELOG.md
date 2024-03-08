@@ -1,3 +1,7 @@
+# v0.6.2
+## Changes
+- Add startup delay option to CLI
+
 # v0.6.1
 ## Changes
 - Add startup delay to Dockerfile control by `DELAY_STARTUP` environment variable

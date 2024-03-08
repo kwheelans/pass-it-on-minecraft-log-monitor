@@ -1,5 +1,6 @@
+use crate::LOG_TARGET;
 use clap::ValueEnum;
-use log::debug;
+use log::trace;
 use serde::Deserialize;
 use std::ops::Add;
 
@@ -49,6 +50,7 @@ impl LogRecord {
     }
 
     pub fn from_record(record: &str) -> Option<LogRecord> {
+        trace!(target: LOG_TARGET, "Processing log: {}", record);
         if !record.starts_with(SQUARE_BRACKETS[0]) {
             None
         } else {
@@ -120,13 +122,12 @@ fn parse_status_message(time: &str, level: LogLevel, class: LogClass, log_messag
         }
         _ => status_msg.add(log_message),
     };
-    debug!("{}", status_msg);
     status_msg
 }
 
 fn parse_server_start_log(log_message: &str) -> String {
     let split_msg: Vec<_> = log_message.splitn(3, ROUND_BRACKETS).collect();
-    debug!("{}", split_msg.len());
+    trace!(target: LOG_TARGET, "Log message split into {} parts", split_msg.len());
     if split_msg.len() >= 3 {
         String::from("Server started after ").add(split_msg[1])
     } else {

@@ -723,7 +723,7 @@ dependencies = [
 
 [[package]]
 name = "pass-it-on-minecraft-log-monitor"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "anyhow",
  "clap",
