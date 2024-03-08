@@ -4,11 +4,6 @@ on:
   workflow_dispatch:
   push:
     tags: [v*]
-    paths-ignore:
-      - '.github/**'
-      - 'tests/**'
-      - 'systemd/**'
-      - 'README.md'
 
 concurrency:
   group: ${{ github.workflow }}
