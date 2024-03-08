@@ -7,7 +7,7 @@ on:
 env:
   CARGO: cargo
   CROSS_VERSION: v0.2.5
-  RELEASE_BIN: mc-log-monitor
+  RELEASE_BIN: pass-it-on-cli
   RELEASE_DIR: artifacts
   UPLOAD_DIR: upload
 
@@ -58,7 +58,7 @@ jobs:
           echo "CARGO=cross" >> $GITHUB_ENV
 
       - name: Build Binary
-        run: ${{ env.CARGO }} build --release --bin ${{ env.RELEASE_BIN }} --target ${{ matrix.target }}
+        run: ${{ env.CARGO }} build --release --bins --all-features --target ${{ matrix.target }}
 
       - name: Prepare Linux Binaries
         if: matrix.os == 'ubuntu-latest'
@@ -76,7 +76,6 @@ jobs:
         with:
           name: ${{ env.RELEASE_BIN }}-${{ matrix.target }}
           path: ${{ env.UPLOAD_DIR }}/${{ env.RELEASE_BIN }}-${{ github.ref_name }}-${{ matrix.target }}.tar.gz
-
 
   release:
     name: GitHub Release
@@ -106,7 +105,7 @@ jobs:
 
       - name: Generate Checksum
         shell: bash
-        run: |
+        run: |   
           sha512sum *.tar.gz >> checksum.sha512
           #sha512sum *.zip >> checksum.sha512
           b2sum *.tar.gz >> checksum.b2sum
