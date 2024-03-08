@@ -1,5 +1,5 @@
 # v0.6.0
-# Changes
+## Changes
 - Add workflows
 - Add Dockerfile
 - Change crate name
