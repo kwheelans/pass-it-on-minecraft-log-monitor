@@ -7,7 +7,7 @@ on:
 env:
   CARGO: cargo
   CROSS_VERSION: v0.2.5
-  RELEASE_BIN: pass-it-on-server
+  RELEASE_BIN: mc-log-monitor
   RELEASE_DIR: artifacts
   UPLOAD_DIR: upload
 
@@ -58,7 +58,7 @@ jobs:
           echo "CARGO=cross" >> $GITHUB_ENV
 
       - name: Build Binary
-        run: ${{ env.CARGO }} build --release --no-default-features --features server-bin-full,vendored-tls,bundled-sqlite --bin ${{ env.RELEASE_BIN }} --target ${{ matrix.target }}
+        run: ${{ env.CARGO }} build --release --bin ${{ env.RELEASE_BIN }} --target ${{ matrix.target }}
 
       - name: Prepare Linux Binaries
         if: matrix.os == 'ubuntu-latest'
@@ -108,9 +108,9 @@ jobs:
         shell: bash
         run: |
           sha512sum *.tar.gz >> checksum.sha512
-          sha512sum *.zip >> checksum.sha512
+          #sha512sum *.zip >> checksum.sha512
           b2sum *.tar.gz >> checksum.b2sum
-          b2sum *.zip >> checksum.b2sum
+          #b2sum *.zip >> checksum.b2sum
 
       - name: Upload Checksum sha512
         uses: sekwah41/upload-release-assets@v1
@@ -119,7 +119,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./checksum.sha512
-          asset_name: checksum.sha512
+          asset_name: ${{ github.event.repository.name }}-checksum.sha512
           asset_content_type: text/plain
 
       - name: Upload Checksum blake2
@@ -129,5 +129,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./checksum.b2sum
-          asset_name: checksum.b2sum
+          asset_name: ${{ github.event.repository.name }}-checksum.b2sum
           asset_content_type: text/plain
