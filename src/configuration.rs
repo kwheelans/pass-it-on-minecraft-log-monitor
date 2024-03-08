@@ -41,7 +41,7 @@ fn default_freq() -> u64 {
 }
 
 fn default_levels() -> HashSet<LogLevel> {
-    [LogLevel::Error].iter().copied().collect()
+    [LogLevel::Error, LogLevel::Fatal].iter().copied().collect()
 }
 
 fn default_classes() -> HashSet<LogClass> {

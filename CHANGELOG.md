@@ -1,3 +1,8 @@
+# Unreleased
+## Changes
+- Added additional `LogLevel` values
+
+
 # v0.6.2
 ## Changes
 - Add startup delay option to CLI

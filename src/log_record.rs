@@ -12,9 +12,12 @@ const STATUS_DELIM: &str = " - ";
 
 #[derive(Debug, PartialEq, Eq, Hash, ValueEnum, Deserialize, Clone, Copy)]
 pub enum LogLevel {
+    Trace,
+    Debug,
     Info,
     Warning,
     Error,
+    Fatal,
     Other,
 }
 
@@ -81,9 +84,12 @@ fn parse_log_level(level_string: &str) -> LogLevel {
         .split_once(BACKSLASH)
         .unwrap();
     match level.1 {
+        "TRACE" => LogLevel::Trace,
+        "DEBUG" => LogLevel::Debug,
         "INFO" => LogLevel::Info,
         "WARN" => LogLevel::Warning,
         "ERROR" => LogLevel::Error,
+        "FATAL" => LogLevel::Fatal,
         _ => LogLevel::Other,
     }
 }
