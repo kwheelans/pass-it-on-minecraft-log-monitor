@@ -148,9 +148,9 @@ dependencies = [
 
 [[package]]
 name = "bumpalo"
-version = "3.15.3"
+version = "3.15.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ea184aa71bb362a1157c896979544cc23974e08fd265f29ea96b59f0b4a555b"
+checksum = "7ff69b9dd49fd426c69a0db9fc04dd934cdb6645ff000864d98f7e2af8830eaa"
 
 [[package]]
 name = "bytes"
@@ -703,9 +703,9 @@ dependencies = [
 
 [[package]]
 name = "pass-it-on"
-version = "0.14.2"
+version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "960401c9100ec08acaa0c1311aed4b4df6ea3e4d3ef456948702a24fd8b591ac"
+checksum = "bddcc0c7a4ee96978baad4d390f341581058650152f424a3d95f7029ba6979c1"
 dependencies = [
  "async-trait",
  "blake3",
@@ -723,7 +723,7 @@ dependencies = [
 
 [[package]]
 name = "pass-it-on-minecraft-log-monitor"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "clap",
