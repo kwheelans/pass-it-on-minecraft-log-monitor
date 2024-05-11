@@ -16,7 +16,7 @@ pass-it-on = { version = "0.14", features = ["client", "http-client", "parse-cfg
 log = "0.4"
 toml = "0.8"
 serde = { version = "1.0.189", features = ["derive"] }
-simple_logger = "4.2"
+simple_logger = "5"
 
 
 [profile.release]
