@@ -1,7 +1,10 @@
 # Unreleased
+
+# v0.6.3
 ## Changes
 - Added additional `LogLevel` values
-
+- Update simple_logger to version 5
+- Update pass-it-on to version 0.14.4
 
 # v0.6.2
 ## Changes

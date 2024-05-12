@@ -1,7 +1,7 @@
 [package]
 name = "pass-it-on-minecraft-log-monitor"
 description = "A simple Minecraft server status monitor using pass-it-on client"
-version = "0.6.2"
+version = "0.6.3"
 edition = "2021"
 authors = ["Kevin Wheelans <kevin.wheelans@proton.me"]
 repository = "https://github.com/kwheelans/pass-it-on-minecraft-log-monitor"
