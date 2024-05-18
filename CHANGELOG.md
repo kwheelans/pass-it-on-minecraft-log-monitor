@@ -1,5 +1,9 @@
 # Unreleased
 
+# v0.7.0
+## Breaking Changes
+- bump pass-it-on to 0.15.0 which contains breaking changes
+
 # v0.6.3
 ## Changes
 - Added additional `LogLevel` values
