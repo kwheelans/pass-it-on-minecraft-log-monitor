@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use clap::Parser;
-use log::LevelFilter;
+use tracing::level_filters::LevelFilter;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]

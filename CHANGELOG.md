@@ -1,4 +1,8 @@
 # Unreleased
+# v0.8.0
+## Changes
+- update pass-it-on to v0.16.0
+- switch to tracing from log for logging
 
 # v0.7.0
 ## Breaking Changes

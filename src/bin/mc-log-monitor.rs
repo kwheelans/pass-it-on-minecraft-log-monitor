@@ -1,23 +1,16 @@
 use clap::Parser;
-use log::{error, info, LevelFilter};
 use pass_it_on::{start_client, Error};
 use pass_it_on_minecraft_log_monitor::configuration::MonitorConfigFileParser;
 use pass_it_on_minecraft_log_monitor::{monitor_log, CliArgs, LOG_TARGET};
 use std::io::ErrorKind;
 use std::time::Duration;
 use tokio::sync::mpsc;
+use tracing::{error, info};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let args = CliArgs::parse();
-    simple_logger::SimpleLogger::new()
-        .with_level(LevelFilter::Off)
-        .env()
-        .with_module_level(pass_it_on::LIB_LOG_TARGET, args.log_level())
-        .with_module_level(LOG_TARGET, args.log_level())
-        .with_colors(true)
-        .init()
-        .unwrap();
+    tracing_subscriber::fmt().with_max_level(args.log_level()).init();
 
     if let Err(error) = run(args).await {
         error!(target: LOG_TARGET, "{}", error)

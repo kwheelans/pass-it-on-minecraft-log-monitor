@@ -1,8 +1,8 @@
 use crate::LOG_TARGET;
 use clap::ValueEnum;
-use log::trace;
 use serde::Deserialize;
 use std::ops::Add;
+use tracing::trace;
 
 const SQUARE_BRACKETS: [char; 2] = ['[', ']'];
 const ROUND_BRACKETS: [char; 2] = ['(', ')'];
