@@ -1,4 +1,7 @@
 # Unreleased
+# v0.8.1
+- lock file update
+
 # v0.8.0
 ## Changes
 - update pass-it-on to v0.16.0
