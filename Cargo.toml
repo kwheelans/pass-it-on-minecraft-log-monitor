@@ -2,7 +2,7 @@
 name = "pass-it-on-minecraft-log-monitor"
 description = "A simple Minecraft server status monitor using pass-it-on client"
 version = "0.8.1"
-edition = "2021"
+edition = "2024"
 authors = ["Kevin Wheelans <kevin.wheelans@proton.me"]
 repository = "https://github.com/kwheelans/pass-it-on-minecraft-log-monitor"
 license = "MIT"
@@ -16,7 +16,7 @@ pass-it-on = { version = "0.16", features = ["client", "http-client", "parse-cfg
 toml = "0.8"
 tracing = "0.1"
 tracing-subscriber = "0.3"
-serde = { version = "1.0.189", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
 
 
 [profile.release]

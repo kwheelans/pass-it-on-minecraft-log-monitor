@@ -1,4 +1,7 @@
 # Unreleased
+## Changes
+- Update rust edition to 2024
+
 # v0.8.1
 - lock file update
 
