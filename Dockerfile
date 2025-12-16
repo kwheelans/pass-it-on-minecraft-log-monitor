@@ -17,7 +17,7 @@ COPY ./ .
 RUN cargo build --release --bin mc-log-monitor
 
 # Final image
-FROM debian:12-slim
+FROM debian:13-slim
 
 RUN mkdir /mc-log-monitor
 WORKDIR /mc-log-monitor
