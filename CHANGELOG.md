@@ -1,6 +1,14 @@
 # Unreleased
+
+# v0.8.3
+## Changes
+- Update lock file
+- update docker image to Debian 13
+
+# v0.8.2
 ## Changes
 - Update rust edition to 2024
+- update toml crate to 0.9
 
 # v0.8.1
 - lock file update
