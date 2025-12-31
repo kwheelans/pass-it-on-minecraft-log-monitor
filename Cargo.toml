@@ -12,7 +12,7 @@ license = "MIT"
 anyhow = "1"
 clap = {version = "4", features = ["derive", "cargo"]}
 tokio = { version = "1", features = ["sync", "macros", "rt-multi-thread", "time", "io-util", "fs"]}
-pass-it-on = { version = "0.16", features = ["client", "http-client", "parse-cfg"], default-features = false }
+pass-it-on = { version = "0.17", features = ["client", "http-client", "parse-cfg"], default-features = false }
 toml = "0.9"
 tracing = "0.1"
 tracing-subscriber = "0.3"
