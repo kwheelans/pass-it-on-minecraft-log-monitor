@@ -45,7 +45,7 @@ async fn run(args: CliArgs) -> Result<(), Error> {
         Ok(())
     } else {
         error!(target: LOG_TARGET, "Specified logfile does not exist -> {}", monitor_config.log_path().to_string_lossy());
-        Err(Error::IOError(std::io::Error::new(
+        Err(Error::from(std::io::Error::new(
             ErrorKind::NotFound,
             "file does not exist",
         )))
