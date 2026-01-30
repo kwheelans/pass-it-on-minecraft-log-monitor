@@ -1,7 +1,5 @@
 #IDE
 .idea
-# will have compiled files and executables
-/target/
 
 # DevTest data
 test_data
