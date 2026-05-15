@@ -1,5 +1,9 @@
 # Unreleased
 
+# v0.8.6
+## Changes
+- lockfile updates
+
 # v0.8.5
 ## Changes
 - ensure aws-lc-sys is 0.38 to resolve reported security vulnerabilities
